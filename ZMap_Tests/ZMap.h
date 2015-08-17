@@ -69,29 +69,26 @@ public:
 		return &value;
 	}
 
-	__POSITION* get_head_position()
+	PAIR* get_head_position()
 	{
-		__POSITION** pos; // eax@1
-		unsigned int end_of_table; // ecx@2
+		auto pos = ap_table_;
+		auto end_of_table = &pos[table_size_];
 
-		pos = reinterpret_cast<__POSITION **>(ap_table_);
-		end_of_table = reinterpret_cast<uint32_t>(&pos[table_size_]);
-
-		if (ap_table_ && reinterpret_cast<uint32_t>(pos) < end_of_table)
+		if (ap_table_ && pos < end_of_table)
 		{
 			while (!*pos)
 			{
 				++pos;
-				if (reinterpret_cast<uint32_t>(pos) >= end_of_table) return nullptr;
+				if (pos >= end_of_table) return nullptr;
 			}
 			return *pos;
 		}
 		return nullptr;
 	}
 
-	key_type& get_next(__POSITION*& pos, value_type& value)
+	key_type& get_next(PAIR*& pos, value_type& value)
 	{
-		PAIR* pair = reinterpret_cast<PAIR*>(pos);
+		PAIR* pair = pos;
 
 		if (!pair->next_)
 		{//next ptr was't set or was deleted, we need to search it manually :-(
@@ -115,7 +112,7 @@ public:
 			pair->next_ = *search_start;
 		}
 
-		pos = reinterpret_cast<__POSITION*>(pair->next_);
+		pos = pair->next_;
 		value = pair->value_;
 		return pair->key_;
 	}
@@ -123,7 +120,7 @@ public:
 	template <typename Function>
 	void for_each(Function fn)
 	{
-		__POSITION* pos = get_head_position();
+		auto pos = get_head_position();
 
 		key_type key;
 		value_type value;
