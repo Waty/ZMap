@@ -1,7 +1,6 @@
 #pragma once
-#include <memory>
-
-using __POSITION = void;
+#include <stdint.h>
+#include <type_traits>
 
 template <class key_type, class value_type, class pair_type = key_type>
 class ZMap
@@ -19,20 +18,6 @@ class ZMap
 	uint32_t count_;
 	uint32_t auto_grow_every128_;
 	uint32_t auto_grow_limit_;
-
-	void calc_auto_grow(uint32_t auto_grow_every128)
-	{
-		if (auto_grow_every128) auto_grow_every128_ = auto_grow_every128;
-
-		if (auto_grow_every128_ == 0xFFFFFFFF)
-		{
-			auto_grow_limit_ = 0xFFFFFFFF;
-		}
-		else
-		{
-			auto_grow_limit_ = auto_grow_every128_ * this->table_size_ >> 7;
-		}
-	}
 
 	template <typename T>
 	uint32_t get_hash(const T& key) const
@@ -69,7 +54,7 @@ public:
 		return &value;
 	}
 
-	PAIR* get_head_position()
+	PAIR* begin()
 	{
 		auto pos = ap_table_;
 		auto end_of_table = &pos[table_size_];
@@ -120,7 +105,7 @@ public:
 	template <typename Function>
 	void for_each(Function fn)
 	{
-		auto pos = get_head_position();
+		PAIR* pos = begin();
 
 		key_type key;
 		value_type value;
