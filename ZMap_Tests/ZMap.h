@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+
 using __POSITION = void;
 
 template <class key_type, class value_type, class pair_type = key_type>
@@ -34,17 +35,17 @@ class ZMap
 	}
 
 	template <typename T>
-	uint32_t get_hash(const T& key)
+	uint32_t get_hash(const T& key) const
 	{
 		static_assert(std::is_integral<key_type>::value, "This func can only calculate the hash for integral types");
 
-		return _rotr8(reinterpret_cast<unsigned char*>(key)[0], 5);
+		return _rotr(key, 5);
 	};
 
 public:
 	virtual ~ZMap() = default;
 
-	uint32_t count()
+	uint32_t count() const
 	{
 		return count_;
 	}
